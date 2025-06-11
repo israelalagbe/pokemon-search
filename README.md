@@ -1,36 +1,187 @@
-This is a [Next.js](https://nextjs.org) project bootstrapped with [`create-next-app`](https://nextjs.org/docs/app/api-reference/cli/create-next-app).
+# PokéTeam Builder
 
-## Getting Started
+A modern web application for building and optimizing Pokémon teams with detailed analysis and team scoring. Built with Next.js, TypeScript, and Tailwind CSS.
 
-First, run the development server:
+## Features
 
-```bash
-npm run dev
-# or
-yarn dev
-# or
-pnpm dev
-# or
-bun dev
+- **Pokémon Search**: Search for Pokémon by name or ID with real-time results
+- **Team Building**: Add up to 6 Pokémon to your team with duplicate prevention
+- **Team Analysis**: Get detailed statistics and scoring for your team
+- **Local Storage**: Your team is automatically saved and persists between sessions
+- **Responsive Design**: Works seamlessly on desktop and mobile devices
+- **Type Coverage**: Visual display of type diversity in your team
+- **Real-time Evaluation**: Team stats update automatically as you build
+
+## Team Scoring System
+
+The application evaluates your team based on several criteria:
+
+- **+10 points** for each unique Pokémon type
+- **+5 points** if average HP > 80
+- **+5 points** if no duplicate types
+- **-5 points** if average speed < 50
+
+## Tech Stack
+
+- **Framework**: Next.js 15 with App Router
+- **Language**: TypeScript
+- **Styling**: Tailwind CSS
+- **Testing**: Jest + React Testing Library
+- **Icons**: Lucide React
+- **HTTP Client**: Axios
+- **Data Source**: [PokéAPI](https://pokeapi.co)
+
+## Project Structure
+
+```
+src/
+├── app/
+│   ├── api/                    # Backend API routes
+│   │   ├── pokemon/search/     # Pokemon search endpoint
+│   │   └── team/evaluate/      # Team evaluation endpoint
+│   ├── layout.tsx              # Root layout
+│   └── page.tsx               # Main application page
+├── components/                 # Reusable React components
+│   ├── PokemonCard.tsx        # Individual Pokemon display
+│   ├── SearchBar.tsx          # Search input component
+│   ├── TeamDisplay.tsx        # Team overview and stats
+│   ├── LoadingSpinner.tsx     # Loading indicator
+│   └── ErrorMessage.tsx       # Error display component
+├── lib/                       # Utility functions and services
+│   ├── services.ts            # API calls and localStorage
+│   └── utils.ts              # Helper functions
+└── types/
+    └── pokemon.ts            # TypeScript type definitions
 ```
 
-Open [http://localhost:3000](http://localhost:3000) with your browser to see the result.
+## Setup Instructions
 
-You can start editing the page by modifying `app/page.tsx`. The page auto-updates as you edit the file.
+### Prerequisites
 
-This project uses [`next/font`](https://nextjs.org/docs/app/building-your-application/optimizing/fonts) to automatically optimize and load [Geist](https://vercel.com/font), a new font family for Vercel.
+- Node.js 18+ 
+- npm or yarn
 
-## Learn More
+### Installation
 
-To learn more about Next.js, take a look at the following resources:
+1. **Clone the repository**
+   ```bash
+   git clone <repository-url>
+   cd pokemon-app
+   ```
 
-- [Next.js Documentation](https://nextjs.org/docs) - learn about Next.js features and API.
-- [Learn Next.js](https://nextjs.org/learn) - an interactive Next.js tutorial.
+2. **Install dependencies**
+   ```bash
+   npm install
+   ```
 
-You can check out [the Next.js GitHub repository](https://github.com/vercel/next.js) - your feedback and contributions are welcome!
+3. **Run the development server**
+   ```bash
+   npm run dev
+   ```
 
-## Deploy on Vercel
+4. **Open your browser**
+   Navigate to [http://localhost:3000](http://localhost:3000)
 
-The easiest way to deploy your Next.js app is to use the [Vercel Platform](https://vercel.com/new?utm_medium=default-template&filter=next.js&utm_source=create-next-app&utm_campaign=create-next-app-readme) from the creators of Next.js.
+### Building for Production
 
-Check out our [Next.js deployment documentation](https://nextjs.org/docs/app/building-your-application/deploying) for more details.
+```bash
+npm run build
+npm start
+```
+
+## Running Tests
+
+```bash
+# Run all tests
+npm test
+
+# Run tests in watch mode
+npm run test:watch
+
+# Run tests with coverage
+npm run test:coverage
+```
+
+## API Endpoints
+
+### Search Pokémon
+```
+GET /api/pokemon/search?q={query}
+```
+- Search by name (e.g., "pikachu") or ID (e.g., "25")
+- Supports partial name matching
+- Returns array of Pokémon data
+
+### Evaluate Team
+```
+POST /api/team/evaluate
+```
+- Request body: `{ team: Pokemon[] }`
+- Returns team statistics and score
+- Validates team size (1-6 Pokémon)
+
+## Usage Guide
+
+1. **Search for Pokémon**: Use the search bar to find Pokémon by name or ID
+2. **Build Your Team**: Click the + button to add Pokémon to your team (max 6)
+3. **View Team Stats**: Your team analysis appears on the right side
+4. **Optimize**: Use the scoring system to improve your team composition
+5. **Manage Team**: Remove Pokémon or clear your entire team as needed
+
+## Key Features Implementation
+
+### Frontend-Backend Separation
+- **Frontend**: React components in `/src/components` and main page
+- **Backend**: API routes in `/src/app/api` that interface with PokéAPI
+- **Data Flow**: Frontend → Your API → PokéAPI (never direct frontend to PokéAPI)
+
+### Error Handling
+- Network error handling with user-friendly messages
+- API rate limiting consideration
+- Invalid search result handling
+- Empty state management
+
+### Team Management
+- Duplicate Pokémon prevention
+- Team size validation (max 6)
+- Persistent storage using localStorage
+- Real-time team evaluation
+
+### Performance Optimizations
+- Debounced search to reduce API calls
+- Image optimization with Next.js Image component
+- Efficient re-rendering with proper React patterns
+
+## Assumptions
+
+1. **API Reliability**: PokéAPI is assumed to be generally reliable, but the app handles failures gracefully
+2. **Browser Support**: Modern browsers with localStorage support
+3. **Image Availability**: Pokémon sprites from PokéAPI are assumed to be available
+4. **Search Scope**: Limited to the first 1000 Pokémon for partial name searches
+5. **Team Persistence**: Teams are stored locally and not synced across devices
+
+## Future Enhancements
+
+- User accounts and team sharing
+- Advanced team analysis (type effectiveness, move sets)
+- Pokémon comparison tool
+- Team export/import functionality
+- Battle simulation
+- More sophisticated scoring algorithms
+
+## Contributing
+
+1. Fork the repository
+2. Create a feature branch
+3. Make your changes
+4. Add tests for new functionality
+5. Ensure all tests pass
+6. Submit a pull request
+
+## License
+
+This project is for educational/interview purposes. Pokémon data is provided by [PokéAPI](https://pokeapi.co).
+
+---
+
+Built with ❤️ using Next.js and the PokéAPI
