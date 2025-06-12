@@ -1,7 +1,8 @@
 'use client';
 
 import React, { useState, useEffect } from 'react';
-import { PokemonService, LocalStorageService } from '@/lib/services';
+import { PokemonService, TeamService, TeamStorageService } from '@/services';
+import { RequestCancelledError } from '@/errors';
 import { isPokemonInTeam } from '@/lib/utils';
 import type { Pokemon, TeamStats, ApiError } from '@/types/pokemon';
 import SearchBar from '@/components/SearchBar';
@@ -22,7 +23,7 @@ export default function Home() {
 
   useEffect(() => {
     setIsHydrated(true);
-    const savedTeam = LocalStorageService.loadTeam();
+    const savedTeam = TeamStorageService.loadTeam();
     setTeam(savedTeam);
     if (savedTeam.length > 0) {
       evaluateTeam(savedTeam);
@@ -31,7 +32,7 @@ export default function Home() {
 
   useEffect(() => {
     if (!isHydrated) return;
-    LocalStorageService.saveTeam(team);
+    TeamStorageService.saveTeam(team);
     if (team.length > 0) {
       evaluateTeam(team);
     } else {
@@ -48,8 +49,7 @@ export default function Home() {
       const results = await PokemonService.searchPokemon(query, signal);
       setSearchResults(results);
     } catch (error) {
-      if ((error as Error).message === 'Request was cancelled') {
-        // Don't update state for cancelled requests
+      if (error instanceof RequestCancelledError) {
         return;
       }
       const apiError = error as ApiError;
@@ -68,7 +68,7 @@ export default function Home() {
 
     setIsEvaluating(true);
     try {
-      const stats = await PokemonService.evaluateTeam(currentTeam);
+      const stats = await TeamService.evaluateTeam(currentTeam);
       setTeamStats(stats);
     } catch (error) {
       console.error('Failed to evaluate team:', error);
@@ -100,7 +100,7 @@ export default function Home() {
   const clearTeam = () => {
     setTeam([]);
     setTeamStats(null);
-    LocalStorageService.clearTeam();
+    TeamStorageService.clearTeam();
     setError(null);
   };
 
