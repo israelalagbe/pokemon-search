@@ -4,7 +4,7 @@ A web application for building and optimising Pokémon teams with detailed analy
 
 ## Demo
 
-<img src="https://github-production-user-asset-6210df.s3.amazonaws.com/22811493/454174593-d2d10484-6e33-48a8-ab72-c144b3a674ae.gif?X-Amz-Algorithm=AWS4-HMAC-SHA256&X-Amz-Credential=AKIAVCODYLSA53PQK4ZA%2F20250612%2Fus-east-1%2Fs3%2Faws4_request&X-Amz-Date=20250612T012017Z&X-Amz-Expires=300&X-Amz-Signature=bec4de5704c8bd2a05b3030aea21ef78878986d730bfb5c4e583056387643da1&X-Amz-SignedHeaders=host" alt="Demo Video" width="800" />
+<img src="https://github.com/user-attachments/assets/4ac33888-8020-41d2-81b3-cf0d4cdbffb8" alt="Demo Video" width="800" />
 
 ## Features
 
