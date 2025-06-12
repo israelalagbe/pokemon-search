@@ -1,4 +1,4 @@
-# PokéTeam Team Builder
+# Pokémon Team Builder
 
 A web application for building and optimising Pokémon teams with detailed analysis and team scoring. Built with Next.js, TypeScript, and Tailwind CSS.
 
