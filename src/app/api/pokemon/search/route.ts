@@ -16,11 +16,9 @@ export async function GET(request: NextRequest) {
       );
     }
 
-    // Check if query is a number (ID search)
     const isNumericId = /^\d+$/.test(query);
     
     if (isNumericId) {
-      // Search by ID
       try {
         const response = await axios.get<Pokemon>(`${POKEAPI_BASE_URL}/pokemon/${query}`);
         return NextResponse.json([response.data]);

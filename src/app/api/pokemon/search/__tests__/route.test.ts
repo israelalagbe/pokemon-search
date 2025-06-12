@@ -79,6 +79,7 @@ describe('/api/pokemon/search', () => {
       isAxiosError: true,
       response: { status: 404 },
     });
+    mockedAxios.isAxiosError = jest.fn().mockReturnValue(true);
 
     const request = new NextRequest('http://localhost:3000/api/pokemon/search?q=99999');
     const response = await GET(request);
@@ -89,6 +90,9 @@ describe('/api/pokemon/search', () => {
   });
 
   it('should search by partial name when exact match fails', async () => {
+    // Mock isAxiosError
+    mockedAxios.isAxiosError = jest.fn().mockReturnValue(true);
+    
     // First call (exact match) fails
     mockedAxios.get
       .mockRejectedValueOnce({
@@ -109,6 +113,8 @@ describe('/api/pokemon/search', () => {
   });
 
   it('should return 404 when no partial matches found', async () => {
+    mockedAxios.isAxiosError = jest.fn().mockReturnValue(true);
+    
     mockedAxios.get
       .mockRejectedValueOnce({
         isAxiosError: true,
@@ -127,6 +133,7 @@ describe('/api/pokemon/search', () => {
   });
 
   it('should return 500 for unexpected errors', async () => {
+    mockedAxios.isAxiosError = jest.fn().mockReturnValue(false);
     mockedAxios.get.mockRejectedValueOnce(new Error('Network error'));
 
     const request = new NextRequest('http://localhost:3000/api/pokemon/search?q=pikachu');

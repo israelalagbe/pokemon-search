@@ -19,7 +19,6 @@ export default function Home() {
   const [error, setError] = useState<string | null>(null);
   const [hasSearched, setHasSearched] = useState(false);
 
-  // Load team from localStorage on component mount
   useEffect(() => {
     const savedTeam = LocalStorageService.loadTeam();
     setTeam(savedTeam);
@@ -28,7 +27,6 @@ export default function Home() {
     }
   }, []);
 
-  // Save team to localStorage whenever team changes
   useEffect(() => {
     LocalStorageService.saveTeam(team);
     if (team.length > 0) {
@@ -67,7 +65,6 @@ export default function Home() {
       setTeamStats(stats);
     } catch (error) {
       console.error('Failed to evaluate team:', error);
-      // Don't show error to user for team evaluation as it's not critical
     } finally {
       setIsEvaluating(false);
     }
@@ -107,7 +104,6 @@ export default function Home() {
   return (
     <div className="min-h-screen bg-gradient-to-br from-blue-50 to-indigo-100">
       <div className="container mx-auto px-4 py-8">
-        {/* Header */}
         <div className="text-center mb-8">
           <h1 className="text-4xl font-bold text-gray-800 mb-2">PokéTeam Builder</h1>
           <p className="text-lg text-gray-600">
@@ -115,12 +111,10 @@ export default function Home() {
           </p>
         </div>
 
-        {/* Search Section */}
         <div className="flex justify-center mb-8">
           <SearchBar onSearch={handleSearch} isLoading={isSearching} />
         </div>
 
-        {/* Error Display */}
         {error && (
           <div className="mb-6">
             <ErrorMessage message={error} onDismiss={dismissError} />
@@ -128,7 +122,6 @@ export default function Home() {
         )}
 
         <div className="grid grid-cols-1 lg:grid-cols-3 gap-8">
-          {/* Search Results */}
           <div className="lg:col-span-2">
             <h2 className="text-2xl font-bold text-gray-800 mb-4">
               {hasSearched ? 'Search Results' : 'Featured Pokémon'}
@@ -170,7 +163,6 @@ export default function Home() {
             )}
           </div>
 
-          {/* Team Display */}
           <div className="lg:col-span-1">
             <div className="sticky top-8">
               {isEvaluating && (
@@ -189,7 +181,6 @@ export default function Home() {
           </div>
         </div>
 
-        {/* Footer */}
         <footer className="mt-16 text-center text-gray-500 text-sm">
           <p>
             Data provided by{' '}

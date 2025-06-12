@@ -12,7 +12,6 @@ interface SearchBarProps {
 export default function SearchBar({ onSearch, isLoading }: SearchBarProps) {
   const [query, setQuery] = useState('');
 
-  // Debounce search to avoid too many API calls
   const debouncedSearch = useCallback(
     debounce((searchQuery: string) => {
       if (searchQuery.trim()) {
