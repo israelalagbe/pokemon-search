@@ -4,13 +4,14 @@ A modern web application for building and optimizing Pokémon teams with detaile
 
 ## Features
 
-- **Pokémon Search**: Search for Pokémon by name or ID with real-time results
+- **Pokémon Search**: Search for Pokémon by name or ID with real-time results and debounced input
 - **Team Building**: Add up to 6 Pokémon to your team with duplicate prevention
 - **Team Analysis**: Get detailed statistics and scoring for your team
 - **Local Storage**: Your team is automatically saved and persists between sessions
 - **Responsive Design**: Works seamlessly on desktop and mobile devices
 - **Type Coverage**: Visual display of type diversity in your team
 - **Real-time Evaluation**: Team stats update automatically as you build
+- **Optimized Search**: Debounced search input reduces API calls and improves performance
 
 ## Team Scoring System
 
@@ -30,29 +31,6 @@ The application evaluates your team based on several criteria:
 - **Icons**: Lucide React
 - **HTTP Client**: Axios
 - **Data Source**: [PokéAPI](https://pokeapi.co)
-
-## Project Structure
-
-```
-src/
-├── app/
-│   ├── api/                    # Backend API routes
-│   │   ├── pokemon/search/     # Pokemon search endpoint
-│   │   └── team/evaluate/      # Team evaluation endpoint
-│   ├── layout.tsx              # Root layout
-│   └── page.tsx               # Main application page
-├── components/                 # Reusable React components
-│   ├── PokemonCard.tsx        # Individual Pokemon display
-│   ├── SearchBar.tsx          # Search input component
-│   ├── TeamDisplay.tsx        # Team overview and stats
-│   ├── LoadingSpinner.tsx     # Loading indicator
-│   └── ErrorMessage.tsx       # Error display component
-├── lib/                       # Utility functions and services
-│   ├── services.ts            # API calls and localStorage
-│   └── utils.ts              # Helper functions
-└── types/
-    └── pokemon.ts            # TypeScript type definitions
-```
 
 ## Setup Instructions
 
@@ -133,24 +111,13 @@ POST /api/team/evaluate
 ### Frontend-Backend Separation
 - **Frontend**: React components in `/src/components` and main page
 - **Backend**: API routes in `/src/app/api` that interface with PokéAPI
-- **Data Flow**: Frontend → Your API → PokéAPI (never direct frontend to PokéAPI)
+- **Data Flow**: Frontend → NEXT API → PokéAPI
 
 ### Error Handling
 - Network error handling with user-friendly messages
 - API rate limiting consideration
 - Invalid search result handling
 - Empty state management
-
-### Team Management
-- Duplicate Pokémon prevention
-- Team size validation (max 6)
-- Persistent storage using localStorage
-- Real-time team evaluation
-
-### Performance Optimizations
-- Debounced search to reduce API calls
-- Image optimization with Next.js Image component
-- Efficient re-rendering with proper React patterns
 
 ## Assumptions
 
@@ -159,24 +126,6 @@ POST /api/team/evaluate
 3. **Image Availability**: Pokémon sprites from PokéAPI are assumed to be available
 4. **Search Scope**: Limited to the first 1000 Pokémon for partial name searches
 5. **Team Persistence**: Teams are stored locally and not synced across devices
-
-## Future Enhancements
-
-- User accounts and team sharing
-- Advanced team analysis (type effectiveness, move sets)
-- Pokémon comparison tool
-- Team export/import functionality
-- Battle simulation
-- More sophisticated scoring algorithms
-
-## Contributing
-
-1. Fork the repository
-2. Create a feature branch
-3. Make your changes
-4. Add tests for new functionality
-5. Ensure all tests pass
-6. Submit a pull request
 
 ## License
 
