@@ -1,4 +1,3 @@
-// Core Pokemon types from PokeAPI
 export interface Pokemon {
   id: number;
   name: string;
@@ -29,7 +28,6 @@ export interface PokemonType {
   };
 }
 
-// Search results type
 export interface PokemonSearchResult {
   name: string;
   url: string;
@@ -39,7 +37,6 @@ export interface PokemonSearchResponse {
   results: PokemonSearchResult[];
 }
 
-// Team evaluation types
 export interface TeamStats {
   averageHp: number;
   averageAttack: number;
@@ -51,7 +48,6 @@ export interface TeamStats {
   teamScore: number;
 }
 
-// Error handling
 export interface ApiError {
   message: string;
   status?: number;

@@ -1,76 +1,59 @@
-import type { Pokemon } from '@/types/pokemon';
 import { StorageError } from '@/errors';
 
-/**
- * Service for localStorage operations
- */
 export class LocalStorageService {
-  private static TEAM_KEY = 'pokemon-team';
-
-  /**
-   * Save a Pokemon team to localStorage
-   */
-  static saveTeam(team: Pokemon[]): void {
+  static save<T>(key: string, data: T): void {
     try {
-      localStorage.setItem(this.TEAM_KEY, JSON.stringify(team));
+      localStorage.setItem(key, JSON.stringify(data));
     } catch (error) {
       const storageError = new StorageError('save', error as Error);
-      console.error('Failed to save team to localStorage:', storageError);
-      // Don't throw for saveTeam to maintain backward compatibility
+      console.error(`Failed to save data to localStorage (key: ${key}):`, storageError);
     }
   }
 
-  /**
-   * Load a Pokemon team from localStorage
-   */
-  static loadTeam(): Pokemon[] {
+  static load<T>(key: string, defaultValue: T): T {
     try {
-      const savedTeam = localStorage.getItem(this.TEAM_KEY);
-      return savedTeam ? JSON.parse(savedTeam) : [];
+      const savedData = localStorage.getItem(key);
+      return savedData ? JSON.parse(savedData) : defaultValue;
     } catch (error) {
       const storageError = new StorageError('load', error as Error);
-      console.error('Failed to load team from localStorage:', storageError);
-      return [];
+      console.error(`Failed to load data from localStorage (key: ${key}):`, storageError);
+      return defaultValue;
     }
   }
 
-  /**
-   * Clear the saved Pokemon team from localStorage
-   */
-  static clearTeam(): void {
+  static remove(key: string): void {
     try {
-      localStorage.removeItem(this.TEAM_KEY);
+      localStorage.removeItem(key);
     } catch (error) {
       const storageError = new StorageError('clear', error as Error);
-      console.error('Failed to clear team from localStorage:', storageError);
-      // Don't throw for clearTeam to maintain backward compatibility
+      console.error(`Failed to remove data from localStorage (key: ${key}):`, storageError);
     }
   }
 
-  /**
-   * Save user preferences to localStorage
-   */
-  static savePreferences(preferences: Record<string, any>): void {
+  static clear(): void {
     try {
-      localStorage.setItem('pokemon-preferences', JSON.stringify(preferences));
+      localStorage.clear();
     } catch (error) {
-      const storageError = new StorageError('save', error as Error);
-      console.error('Failed to save preferences to localStorage:', storageError);
-      // Don't throw to maintain consistency
+      const storageError = new StorageError('clear', error as Error);
+      console.error('Failed to clear localStorage:', storageError);
     }
   }
 
-  /**
-   * Load user preferences from localStorage
-   */
-  static loadPreferences(): Record<string, any> {
+  static exists(key: string): boolean {
     try {
-      const savedPreferences = localStorage.getItem('pokemon-preferences');
-      return savedPreferences ? JSON.parse(savedPreferences) : {};
+      return localStorage.getItem(key) !== null;
     } catch (error) {
-      const storageError = new StorageError('load', error as Error);
-      console.error('Failed to load preferences from localStorage:', storageError);
-      return {};
+      console.error(`Failed to check if key exists in localStorage (key: ${key}):`, error);
+      return false;
+    }
+  }
+
+  static getKeys(): string[] {
+    try {
+      return Object.keys(localStorage);
+    } catch (error) {
+      console.error('Failed to get localStorage keys:', error);
+      return [];
     }
   }
 }

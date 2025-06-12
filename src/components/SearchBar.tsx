@@ -3,6 +3,7 @@
 import React, { useState, useRef, useEffect } from 'react';
 import { Search, Loader2 } from 'lucide-react';
 import { createDebouncedSearch } from '@/lib/utils';
+import { RequestCancelledError } from '@/errors';
 
 interface SearchBarProps {
   onSearch: (query: string, signal: AbortSignal) => Promise<void>;
@@ -15,7 +16,6 @@ export default function SearchBar({ onSearch, isLoading }: SearchBarProps) {
 
   useEffect(() => {
     return () => {
-      // Cleanup on unmount
       debouncedSearchRef.current.cancel();
     };
   }, []);
@@ -34,11 +34,10 @@ export default function SearchBar({ onSearch, isLoading }: SearchBarProps) {
   const handleSubmit = (e: React.FormEvent) => {
     e.preventDefault();
     if (query.trim()) {
-      // Cancel debounced search and execute immediately
       debouncedSearchRef.current.cancel();
       const controller = new AbortController();
       onSearch(query.trim(), controller.signal).catch((error) => {
-        if (error.message !== 'Request was cancelled') {
+        if (!(error instanceof RequestCancelledError)) {
           console.error('Search error:', error);
         }
       });

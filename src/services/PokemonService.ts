@@ -4,13 +4,7 @@ import { RequestCancelledError, SearchError } from '@/errors';
 
 const API_BASE_URL = '/api';
 
-/**
- * Service for Pokemon-related API operations
- */
 export class PokemonService {
-  /**
-   * Search for Pokemon by query string
-   */
   static async searchPokemon(query: string, signal?: AbortSignal): Promise<Pokemon[]> {
     try {
       const response = await axios.get(`${API_BASE_URL}/pokemon/search?q=${encodeURIComponent(query)}`, {
@@ -32,9 +26,6 @@ export class PokemonService {
     }
   }
 
-  /**
-   * Get Pokemon by ID
-   */
   static async getPokemonById(id: number, signal?: AbortSignal): Promise<Pokemon> {
     try {
       const response = await axios.get(`${API_BASE_URL}/pokemon/${id}`, {

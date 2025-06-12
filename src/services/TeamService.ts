@@ -4,13 +4,7 @@ import { TeamEvaluationError } from '@/errors';
 
 const API_BASE_URL = '/api';
 
-/**
- * Service for team-related operations
- */
 export class TeamService {
-  /**
-   * Evaluate a Pokemon team's effectiveness
-   */
   static async evaluateTeam(team: Pokemon[]): Promise<TeamStats> {
     try {
       const response = await axios.post(`${API_BASE_URL}/team/evaluate`, { team });
@@ -27,9 +21,6 @@ export class TeamService {
     }
   }
 
-  /**
-   * Get team recommendations based on current team
-   */
   static async getTeamRecommendations(team: Pokemon[]): Promise<Pokemon[]> {
     try {
       const response = await axios.post(`${API_BASE_URL}/team/recommendations`, { team });

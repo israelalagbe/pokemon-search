@@ -80,15 +80,12 @@ export function createDebouncedSearch() {
 
   return {
     search: (searchFn: (query: string, signal: AbortSignal) => Promise<void>, query: string, delay: number = 500) => {
-      // Cancel previous search
       if (currentController) {
         currentController.abort();
       }
       
-      // Clear existing timeout
       clearTimeout(timeout);
       
-      // Set new timeout
       timeout = setTimeout(() => {
         currentController = new AbortController();
         searchFn(query, currentController.signal).catch((error) => {

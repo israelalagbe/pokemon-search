@@ -10,7 +10,6 @@ import {
 } from '@/lib/utils';
 import type { Pokemon } from '@/types/pokemon';
 
-// Mock Pokemon data for testing
 const mockPokemon: Pokemon = {
   id: 25,
   name: 'pikachu',

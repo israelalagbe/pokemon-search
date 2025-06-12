@@ -1,4 +1,4 @@
-import { PokemonService, TeamService, LocalStorageService } from '@/services';
+import { PokemonService, TeamService, LocalStorageService, TeamStorageService } from '@/services';
 import { RequestCancelledError, SearchError, TeamEvaluationError } from '@/errors';
 import axios from 'axios';
 import type { Pokemon } from '@/types/pokemon';
@@ -169,26 +169,122 @@ describe('LocalStorageService', () => {
     jest.clearAllMocks();
   });
 
-  describe('saveTeam', () => {
-    it('should save team to localStorage', () => {
-      const team = [mockPokemon];
+  describe('save', () => {
+    it('should save data to localStorage', () => {
+      const testData = { test: 'data' };
 
-      LocalStorageService.saveTeam(team);
+      LocalStorageService.save('test-key', testData);
 
       expect(localStorageMock.setItem).toHaveBeenCalledWith(
-        'pokemon-team',
-        JSON.stringify(team)
+        'test-key',
+        JSON.stringify(testData)
       );
     });
 
     it('should handle save errors gracefully', () => {
-      const team = [mockPokemon];
+      const testData = { test: 'data' };
       localStorageMock.setItem.mockImplementation(() => {
         throw new Error('Storage error');
       });
 
       // Should not throw
-      expect(() => LocalStorageService.saveTeam(team)).not.toThrow();
+      expect(() => LocalStorageService.save('test-key', testData)).not.toThrow();
+    });
+  });
+
+  describe('load', () => {
+    it('should load data from localStorage', () => {
+      const testData = { test: 'data' };
+      localStorageMock.getItem.mockReturnValue(JSON.stringify(testData));
+
+      const result = LocalStorageService.load('test-key', {});
+
+      expect(result).toEqual(testData);
+      expect(localStorageMock.getItem).toHaveBeenCalledWith('test-key');
+    });
+
+    it('should return default value when no data saved', () => {
+      const defaultValue = { default: 'value' };
+      localStorageMock.getItem.mockReturnValue(null);
+
+      const result = LocalStorageService.load('test-key', defaultValue);
+
+      expect(result).toEqual(defaultValue);
+    });
+
+    it('should handle load errors gracefully', () => {
+      const defaultValue = { default: 'value' };
+      localStorageMock.getItem.mockImplementation(() => {
+        throw new Error('Storage error');
+      });
+
+      const result = LocalStorageService.load('test-key', defaultValue);
+
+      expect(result).toEqual(defaultValue);
+    });
+
+    it('should handle invalid JSON gracefully', () => {
+      const defaultValue = { default: 'value' };
+      localStorageMock.getItem.mockReturnValue('invalid json');
+
+      const result = LocalStorageService.load('test-key', defaultValue);
+
+      expect(result).toEqual(defaultValue);
+    });
+  });
+
+  describe('remove', () => {
+    it('should remove data from localStorage', () => {
+      LocalStorageService.remove('test-key');
+
+      expect(localStorageMock.removeItem).toHaveBeenCalledWith('test-key');
+    });
+
+    it('should handle remove errors gracefully', () => {
+      localStorageMock.removeItem.mockImplementation(() => {
+        throw new Error('Storage error');
+      });
+
+      // Should not throw
+      expect(() => LocalStorageService.remove('test-key')).not.toThrow();
+    });
+  });
+
+  describe('exists', () => {
+    it('should return true if key exists', () => {
+      localStorageMock.getItem.mockReturnValue('some data');
+
+      const result = LocalStorageService.exists('test-key');
+
+      expect(result).toBe(true);
+    });
+
+    it('should return false if key does not exist', () => {
+      localStorageMock.getItem.mockReturnValue(null);
+
+      const result = LocalStorageService.exists('test-key');
+
+      expect(result).toBe(false);
+    });
+  });
+});
+
+describe('TeamStorageService', () => {
+  beforeEach(() => {
+    localStorageMock.clear();
+    jest.clearAllMocks();
+  });
+
+  describe('saveTeam', () => {
+    it('should save team to localStorage', () => {
+      const team = [mockPokemon];
+
+      TeamStorageService.saveTeam(team);
+
+      expect(localStorageMock.setItem).toHaveBeenCalledWith(
+        'pokemon-team',
+        JSON.stringify(team)
+      );
     });
   });
 
@@ -197,7 +293,7 @@ describe('LocalStorageService', () => {
       const team = [mockPokemon];
       localStorageMock.getItem.mockReturnValue(JSON.stringify(team));
 
-      const result = LocalStorageService.loadTeam();
+      const result = TeamStorageService.loadTeam();
 
       expect(result).toEqual(team);
       expect(localStorageMock.getItem).toHaveBeenCalledWith('pokemon-team');
@@ -206,25 +302,7 @@ describe('LocalStorageService', () => {
     it('should return empty array when no team saved', () => {
       localStorageMock.getItem.mockReturnValue(null);
 
-      const result = LocalStorageService.loadTeam();
-
-      expect(result).toEqual([]);
-    });
-
-    it('should handle load errors gracefully', () => {
-      localStorageMock.getItem.mockImplementation(() => {
-        throw new Error('Storage error');
-      });
-
-      const result = LocalStorageService.loadTeam();
-
-      expect(result).toEqual([]);
-    });
-
-    it('should handle invalid JSON gracefully', () => {
-      localStorageMock.getItem.mockReturnValue('invalid json');
-
-      const result = LocalStorageService.loadTeam();
+      const result = TeamStorageService.loadTeam();
 
       expect(result).toEqual([]);
     });
@@ -232,18 +310,27 @@ describe('LocalStorageService', () => {
 
   describe('clearTeam', () => {
     it('should clear team from localStorage', () => {
-      LocalStorageService.clearTeam();
+      TeamStorageService.clearTeam();
 
       expect(localStorageMock.removeItem).toHaveBeenCalledWith('pokemon-team');
     });
+  });
 
-    it('should handle clear errors gracefully', () => {
-      localStorageMock.removeItem.mockImplementation(() => {
-        throw new Error('Storage error');
-      });
+  describe('hasTeam', () => {
+    it('should return true if team exists', () => {
+      localStorageMock.getItem.mockReturnValue('[{"id": 1}]');
 
-      // Should not throw
-      expect(() => LocalStorageService.clearTeam()).not.toThrow();
+      const result = TeamStorageService.hasTeam();
+
+      expect(result).toBe(true);
+    });
+
+    it('should return false if no team exists', () => {
+      localStorageMock.getItem.mockReturnValue(null);
+
+      const result = TeamStorageService.hasTeam();
+
+      expect(result).toBe(false);
     });
   });
 });
