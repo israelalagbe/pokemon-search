@@ -4,12 +4,17 @@ import type { Pokemon, TeamStats, ApiError } from '@/types/pokemon';
 const API_BASE_URL = '/api';
 
 export class PokemonService {
-  static async searchPokemon(query: string): Promise<Pokemon[]> {
+  static async searchPokemon(query: string, signal?: AbortSignal): Promise<Pokemon[]> {
     try {
-      const response = await axios.get(`${API_BASE_URL}/pokemon/search?q=${encodeURIComponent(query)}`);
+      const response = await axios.get(`${API_BASE_URL}/pokemon/search?q=${encodeURIComponent(query)}`, {
+        signal,
+      });
       return response.data;
     } catch (error) {
       if (axios.isAxiosError(error)) {
+        if (error.code === 'ERR_CANCELED') {
+          throw new Error('Request was cancelled');
+        }
         const apiError: ApiError = {
           message: error.response?.data?.message || 'Failed to search Pokemon',
           status: error.response?.status,

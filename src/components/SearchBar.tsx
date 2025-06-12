@@ -1,36 +1,47 @@
 'use client';
 
-import React, { useState, useCallback } from 'react';
+import React, { useState, useRef, useEffect } from 'react';
 import { Search, Loader2 } from 'lucide-react';
-import { debounce } from '@/lib/utils';
+import { createDebouncedSearch } from '@/lib/utils';
 
 interface SearchBarProps {
-  onSearch: (query: string) => void;
+  onSearch: (query: string, signal: AbortSignal) => Promise<void>;
   isLoading: boolean;
 }
 
 export default function SearchBar({ onSearch, isLoading }: SearchBarProps) {
   const [query, setQuery] = useState('');
+  const debouncedSearchRef = useRef(createDebouncedSearch());
 
-  const debouncedSearch = useCallback(
-    debounce((searchQuery: string) => {
-      if (searchQuery.trim()) {
-        onSearch(searchQuery.trim());
-      }
-    }, 300),
-    [onSearch]
-  );
+  useEffect(() => {
+    return () => {
+      // Cleanup on unmount
+      debouncedSearchRef.current.cancel();
+    };
+  }, []);
 
   const handleInputChange = (e: React.ChangeEvent<HTMLInputElement>) => {
     const value = e.target.value;
     setQuery(value);
-    debouncedSearch(value);
+    
+    if (value.trim()) {
+      debouncedSearchRef.current.search(onSearch, value.trim(), 500);
+    } else {
+      debouncedSearchRef.current.cancel();
+    }
   };
 
   const handleSubmit = (e: React.FormEvent) => {
     e.preventDefault();
     if (query.trim()) {
-      onSearch(query.trim());
+      // Cancel debounced search and execute immediately
+      debouncedSearchRef.current.cancel();
+      const controller = new AbortController();
+      onSearch(query.trim(), controller.signal).catch((error) => {
+        if (error.message !== 'Request was cancelled') {
+          console.error('Search error:', error);
+        }
+      });
     }
   };
 
@@ -51,7 +62,6 @@ export default function SearchBar({ onSearch, isLoading }: SearchBarProps) {
           value={query}
           onChange={handleInputChange}
           className="block w-full pl-10 pr-3 py-2 border border-gray-300 rounded-md leading-5 bg-white placeholder-gray-500 focus:outline-none focus:placeholder-gray-400 focus:ring-1 focus:ring-blue-500 focus:border-blue-500"
-          disabled={isLoading}
         />
       </div>
     </form>

@@ -59,7 +59,31 @@ describe('PokemonService', () => {
       const result = await PokemonService.searchPokemon('pikachu');
 
       expect(result).toEqual([mockPokemon]);
-      expect(mockedAxios.get).toHaveBeenCalledWith('/api/pokemon/search?q=pikachu');
+      expect(mockedAxios.get).toHaveBeenCalledWith('/api/pokemon/search?q=pikachu', {
+        signal: undefined,
+      });
+    });
+
+    it('should search pokemon with abort signal', async () => {
+      const controller = new AbortController();
+      mockedAxios.get.mockResolvedValue({ data: [mockPokemon] });
+
+      const result = await PokemonService.searchPokemon('pikachu', controller.signal);
+
+      expect(result).toEqual([mockPokemon]);
+      expect(mockedAxios.get).toHaveBeenCalledWith('/api/pokemon/search?q=pikachu', {
+        signal: controller.signal,
+      });
+    });
+
+    it('should handle cancellation errors', async () => {
+      const controller = new AbortController();
+      const cancelError = new Error('Request cancelled');
+      (cancelError as any).code = 'ERR_CANCELED';
+      mockedAxios.get.mockRejectedValue(cancelError);
+      jest.spyOn(axios, 'isAxiosError').mockReturnValue(true);
+
+      await expect(PokemonService.searchPokemon('pikachu', controller.signal)).rejects.toThrow('Request was cancelled');
     });
 
     it('should handle API errors', async () => {

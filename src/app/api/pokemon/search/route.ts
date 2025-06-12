@@ -32,16 +32,13 @@ export async function GET(request: NextRequest) {
         throw error;
       }
     } else {
-      // Search by name
       const lowerQuery = query.toLowerCase();
       
       try {
-        // First try exact match
         const response = await axios.get<Pokemon>(`${POKEAPI_BASE_URL}/pokemon/${lowerQuery}`);
         return NextResponse.json([response.data]);
       } catch (error) {
         if (axios.isAxiosError(error) && error.response?.status === 404) {
-          // If exact match fails, search through all pokemon names
           try {
             const allPokemonResponse = await axios.get<PokemonSearchResponse>(
               `${POKEAPI_BASE_URL}/pokemon?limit=1000`
@@ -58,7 +55,6 @@ export async function GET(request: NextRequest) {
               );
             }
 
-            // Fetch detailed data for matching Pokemon
             const pokemonDetails = await Promise.all(
               matchingPokemon.map(async (pokemon) => {
                 const detailResponse = await axios.get<Pokemon>(pokemon.url);

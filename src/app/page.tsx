@@ -36,15 +36,19 @@ export default function Home() {
     }
   }, [team]);
 
-  const handleSearch = async (query: string) => {
+  const handleSearch = async (query: string, signal: AbortSignal) => {
     setIsSearching(true);
     setError(null);
     setHasSearched(true);
 
     try {
-      const results = await PokemonService.searchPokemon(query);
+      const results = await PokemonService.searchPokemon(query, signal);
       setSearchResults(results);
     } catch (error) {
+      if ((error as Error).message === 'Request was cancelled') {
+        // Don't update state for cancelled requests
+        return;
+      }
       const apiError = error as ApiError;
       setError(apiError.message);
       setSearchResults([]);

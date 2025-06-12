@@ -6,6 +6,7 @@ import {
   isPokemonInTeam,
   getTeamScoreDescription,
   debounce,
+  createDebouncedSearch,
 } from '@/lib/utils';
 import type { Pokemon } from '@/types/pokemon';
 
@@ -156,5 +157,61 @@ describe('debounce', () => {
     jest.advanceTimersByTime(100);
     expect(mockFn).toHaveBeenCalledTimes(1);
     expect(mockFn).toHaveBeenCalledWith('third');
+  });
+});
+
+describe('createDebouncedSearch', () => {
+  beforeEach(() => {
+    jest.useFakeTimers();
+  });
+
+  afterEach(() => {
+    jest.useRealTimers();
+  });
+
+  it('should debounce search calls', async () => {
+    const mockSearchFn = jest.fn().mockResolvedValue(undefined);
+    const debouncedSearch = createDebouncedSearch();
+
+    debouncedSearch.search(mockSearchFn, 'first', 100);
+    debouncedSearch.search(mockSearchFn, 'second', 100);
+    debouncedSearch.search(mockSearchFn, 'third', 100);
+
+    jest.advanceTimersByTime(100);
+    
+    // Wait for the promise to resolve
+    await jest.runAllTimersAsync();
+
+    expect(mockSearchFn).toHaveBeenCalledTimes(1);
+    expect(mockSearchFn).toHaveBeenCalledWith('third', expect.any(AbortSignal));
+  });
+
+  it('should cancel previous requests when new search is made', async () => {
+    const mockSearchFn = jest.fn().mockResolvedValue(undefined);
+    const debouncedSearch = createDebouncedSearch();
+
+    debouncedSearch.search(mockSearchFn, 'first', 100);
+    jest.advanceTimersByTime(50);
+    
+    debouncedSearch.search(mockSearchFn, 'second', 100);
+    jest.advanceTimersByTime(100);
+    
+    // Wait for the promise to resolve
+    await jest.runAllTimersAsync();
+
+    expect(mockSearchFn).toHaveBeenCalledTimes(1);
+    expect(mockSearchFn).toHaveBeenCalledWith('second', expect.any(AbortSignal));
+  });
+
+  it('should cancel all requests when cancel is called', () => {
+    const mockSearchFn = jest.fn().mockResolvedValue(undefined);
+    const debouncedSearch = createDebouncedSearch();
+
+    debouncedSearch.search(mockSearchFn, 'test', 100);
+    debouncedSearch.cancel();
+    
+    jest.advanceTimersByTime(100);
+
+    expect(mockSearchFn).not.toHaveBeenCalled();
   });
 });

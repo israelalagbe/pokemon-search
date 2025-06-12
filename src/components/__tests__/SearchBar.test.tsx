@@ -1,9 +1,17 @@
 import React from 'react';
-import { render, screen, fireEvent } from '@testing-library/react';
+import { render, screen, fireEvent, waitFor } from '@testing-library/react';
 import SearchBar from '@/components/SearchBar';
 
+// Mock the createDebouncedSearch utility
+jest.mock('@/lib/utils', () => ({
+  createDebouncedSearch: () => ({
+    search: jest.fn(),
+    cancel: jest.fn(),
+  }),
+}));
+
 describe('SearchBar', () => {
-  const mockOnSearch = jest.fn();
+  const mockOnSearch = jest.fn().mockResolvedValue(undefined);
 
   beforeEach(() => {
     jest.clearAllMocks();
@@ -21,7 +29,7 @@ describe('SearchBar', () => {
     expect(screen.getByTestId('loading-spinner')).toBeInTheDocument();
   });
 
-  it('calls onSearch when form is submitted', () => {
+  it('calls onSearch when form is submitted', async () => {
     render(<SearchBar onSearch={mockOnSearch} isLoading={false} />);
     
     const input = screen.getByPlaceholderText('Search Pokemon by name or ID...');
@@ -30,10 +38,12 @@ describe('SearchBar', () => {
     fireEvent.change(input, { target: { value: 'pikachu' } });
     fireEvent.submit(form!);
     
-    expect(mockOnSearch).toHaveBeenCalledWith('pikachu');
+    await waitFor(() => {
+      expect(mockOnSearch).toHaveBeenCalledWith('pikachu', expect.any(AbortSignal));
+    });
   });
 
-  it('trims whitespace from search query', () => {
+  it('trims whitespace from search query', async () => {
     render(<SearchBar onSearch={mockOnSearch} isLoading={false} />);
     
     const input = screen.getByPlaceholderText('Search Pokemon by name or ID...');
@@ -42,7 +52,9 @@ describe('SearchBar', () => {
     fireEvent.change(input, { target: { value: '  pikachu  ' } });
     fireEvent.submit(form!);
     
-    expect(mockOnSearch).toHaveBeenCalledWith('pikachu');
+    await waitFor(() => {
+      expect(mockOnSearch).toHaveBeenCalledWith('pikachu', expect.any(AbortSignal));
+    });
   });
 
   it('does not call onSearch with empty query', () => {
@@ -52,12 +64,5 @@ describe('SearchBar', () => {
     fireEvent.submit(form!);
     
     expect(mockOnSearch).not.toHaveBeenCalled();
-  });
-
-  it('disables input when loading', () => {
-    render(<SearchBar onSearch={mockOnSearch} isLoading={true} />);
-    
-    const input = screen.getByPlaceholderText('Search Pokemon by name or ID...');
-    expect(input).toBeDisabled();
   });
 });
