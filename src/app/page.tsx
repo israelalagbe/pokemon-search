@@ -1,7 +1,7 @@
 'use client';
 
 import React, { useState, useEffect } from 'react';
-import { PokemonService, LocalStorageService } from '@/lib/services';
+import { PokemonService, LocalStorageService } from '@/services';
 import { isPokemonInTeam } from '@/lib/utils';
 import type { Pokemon, TeamStats, ApiError } from '@/types/pokemon';
 import SearchBar from '@/components/SearchBar';

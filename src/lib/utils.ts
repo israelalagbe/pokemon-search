@@ -1,4 +1,5 @@
 import type { Pokemon } from '@/types/pokemon';
+import { RequestCancelledError } from '@/errors';
 
 export function formatPokemonName(name: string): string {
   return name.charAt(0).toUpperCase() + name.slice(1);
@@ -91,7 +92,7 @@ export function createDebouncedSearch() {
       timeout = setTimeout(() => {
         currentController = new AbortController();
         searchFn(query, currentController.signal).catch((error) => {
-          if (error.message !== 'Request was cancelled') {
+          if (!(error instanceof RequestCancelledError)) {
             console.error('Search error:', error);
           }
         });
