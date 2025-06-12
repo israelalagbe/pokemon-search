@@ -18,8 +18,10 @@ export default function Home() {
   const [isEvaluating, setIsEvaluating] = useState(false);
   const [error, setError] = useState<string | null>(null);
   const [hasSearched, setHasSearched] = useState(false);
+  const [isHydrated, setIsHydrated] = useState(false);
 
   useEffect(() => {
+    setIsHydrated(true);
     const savedTeam = LocalStorageService.loadTeam();
     setTeam(savedTeam);
     if (savedTeam.length > 0) {
@@ -28,13 +30,14 @@ export default function Home() {
   }, []);
 
   useEffect(() => {
+    if (!isHydrated) return;
     LocalStorageService.saveTeam(team);
     if (team.length > 0) {
       evaluateTeam(team);
     } else {
       setTeamStats(null);
     }
-  }, [team]);
+  }, [team, isHydrated]);
 
   const handleSearch = async (query: string, signal: AbortSignal) => {
     setIsSearching(true);
@@ -176,8 +179,8 @@ export default function Home() {
                 </div>
               )}
               <TeamDisplay
-                team={team}
-                teamStats={teamStats}
+                team={isHydrated ? team : []}
+                teamStats={isHydrated ? teamStats : null}
                 onRemoveFromTeam={removeFromTeam}
                 onClearTeam={clearTeam}
               />
