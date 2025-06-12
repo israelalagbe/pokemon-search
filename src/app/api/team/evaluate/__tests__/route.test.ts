@@ -173,6 +173,9 @@ describe('/api/team/evaluate', () => {
     const request = new NextRequest('http://localhost:3000/api/team/evaluate', {
       method: 'POST',
       body: 'invalid json',
+      headers: {
+        'content-type': 'application/json',
+      },
     });
 
     const response = await POST(request);
